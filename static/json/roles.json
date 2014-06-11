@@ -1,0 +1,58 @@
+{
+  "cto": {
+    "title": "cto",
+    "opn": {
+       "option1":{
+        "name": "Sales Report",
+        "link": "http://www.google.co.in",
+        "color": "green",
+        "icon": "fa fa-signal",
+        "notifications" : "5",
+        "suboptions": {
+          "suboption1": {
+            "name": "suboption1",
+            "link": "http://www.google.co.in"
+          }
+        }
+      },
+      "option2":{
+        "name": "Funnel Report",
+        "link": "http://www.google.co.in",
+        "color": "purple",
+        "icon": "fa fa-map-marker",
+        "notifications" : "3",
+        "suboptions": {
+          "suboption1": {
+            "name": "suboption1",
+            "link": "http://www.google.co.in"
+          },
+          "suboption2": {
+            "name": "suboption2",
+            "link": "http://www.google.co.in"
+          }
+        }
+      },
+      "option3":{
+        "name": "Leads Report",
+        "color": "orange",
+        "link": "http://www.google.co.in",
+        "icon": "fa fa-rocket",
+        "notifications" : "1",
+        "suboptions": {
+          "suboption1": {
+            "name": "suboption1",
+            "link": "http://www.google.co.in"
+          }
+        }
+      },
+      "option4":{
+        "name": "Conversion Report",
+        "notifications" : "2",
+        "link": "http://www.google.co.in",
+        "color": "lightblue",
+        "icon": "fa fa-book",
+        "suboptions" : {}
+      }
+    }
+  }
+}

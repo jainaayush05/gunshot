@@ -1,0 +1,63 @@
+    {% for gy in grouped_yearly %}
+                              <h2>{{ gy.assgn_first_name}}</h2>
+                              <div class="inner">
+                                 <div class="table-holder">
+                                    <table id="basic-table">
+                                       <thead>
+                                          <tr>
+                                             <th>Year</th>
+                                             <th>Amount</th>
+                                          </tr>
+                                       </thead>
+                                       <tbody>
+                                          {% for y in gy %}
+                                          <tr>
+                                             <td>{{ y.year.year }}</td>
+                                             <td>{{ y.amount__sum }}</td>
+                                          </tr>
+                                          {% endfor %}
+                                       </tbody>
+                                    </table>
+                                 </div>
+                              </div>
+                              {% endfor %}
+                              <div class="inner">
+                                 <div class="table-holder">
+                                    <table id="basic-table">
+                                       <thead>
+                                          <tr>
+                                             <th>Month</th>
+                                             <th>Amount</th>
+                                          </tr>
+                                       </thead>
+                                       <tbody>
+                                          {% for m in monthly %}
+                                          <tr>
+                                             <td>{{ m.month.month }}-{{ m.month.year }}</td>
+                                             <td>{{ m.amount__sum }}</td>
+                                          </tr>
+                                          {% endfor %}
+                                       </tbody>
+                                    </table>
+                                 </div>
+                              </div>
+                              <div class="inner">
+                                 <div class="table-holder">
+                                    <table id="basic-table">
+                                       <thead>
+                                          <tr>
+                                             <th>Day</th>
+                                             <th>Amount</th>
+                                          </tr>
+                                       </thead>
+                                       <tbody>
+                                          {% for d in daily %}
+                                          <tr>
+                                             <td>{{ d.day.day}}/{{ d.day.month}}/{{ d.day.year}}</td>
+                                             <td>{{ d.amount__sum }}</td>
+                                          </tr>
+                                          {% endfor %}
+                                       </tbody>
+                                    </table>
+                                 </div>
+                              </div>

@@ -1,0 +1,710 @@
+<!doctype html>
+<html class="fuelux" lang="en">
+   {% include 'includes/header.html' %}
+   <body>
+      <script type="text/javascript">
+       $(function () { $("input,select,textarea").not("[type=submit]").jqBootstrapValidation(); } );
+        $( document ).ready(function() {
+         load_sidebar();
+         {{pie_max|safe}}
+         var series = [{ 'name': 'Google',data: [49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4]}, {'name': 'Email',data: [83.6, 78.8, 98.5, 93.4, 106.0, 84.5, 105.0, 104.3, 91.2, 83.5, 106.6, 92.3]}, {'name': 'Website',data: [48.9, 38.8, 39.3, 41.4, 47.0, 48.3, 59.0, 59.6, 52.4, 65.2, 59.3, 51.2]}, {'name': 'Linkedin',data: [42.4, 33.2, 34.5, 39.7, 52.6, 75.5, 57.4, 60.4, 47.6, 39.1, 46.8, 51.1]}];
+         var categories = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+
+         var pie_data = {{pie_data |safe}}
+
+         var bar_categories= {{ bar_categories|safe }}
+         var bar_series= {{ bar_series|safe }}
+
+         load_bar_chart('column','Total Monthly Sales','Sorted by users',bar_categories, 'Amount (INR)',bar_series);
+         load_baseline_chart('Total Monthly Sales','Sorted by users',bar_categories, 'Amount (INR)',bar_series);
+         load_pie_chart('Sales share(Year 2014)', pie_data);
+         load_regression_chart();
+        
+        });
+       var global_gsm_data;
+       var global_gs_data;
+       var verifygs= function(gs_id){
+         global_gs_data['verified'] = "yes";
+          $.ajax({
+                       url: 'http://localhost:8000/gunshots/'+gs_id,
+                       type: 'put',
+                       dataType: 'json',
+                       data: global_gs_data,
+                       success: function(data3) {
+                        alert('Verification Successful!');
+                        $('#addModal3').modal('hide');
+                     }
+                 });
+       };
+
+       var selectgs =function(gsm_id){
+            global_gs_data['verified'] = "yes";
+            $.ajax({
+                         url: 'http://localhost:8000/gunshots/'+global_gs_data['id'],
+                         type: 'put',
+                         dataType: 'json',
+                         data: global_gs_data,
+                         success: function(data3) {
+                          alert('Verification Successful!');
+                          $('#addModal3').modal('hide');
+                       }
+                   });   
+            
+         
+       };
+       var selectgsm =function(gsm_id){
+         for (var i = 0; i < global_gsm_data.length; i++) { 
+            if (gsm_id == global_gsm_data[i].id)
+            {
+               global_gsm_data[i].id = global_gsm_data[i].gs_id;
+               var key = "gs_id";
+               delete global_gsm_data[i]["gs_id"];
+                $.ajax({
+                       url: 'http://localhost:8000/gunshots/'+global_gsm_data[i].id,
+                       type: 'put',
+                       dataType: 'json',
+                       data: global_gsm_data[i],
+                       success: function(data2) {
+                           
+                           global_gs_data = data2;
+                           html = '<tr><td><input type="checkbox" onclick= "verifygs('+data2.id+')">Verify</td><td>'+data2.amount+'</td>'+'<td>'+data2.assgn_first_name+'</td>'+'<td>'+data2.amount+'</td>'+'<td>'+data2.campaign_id+'</td>'+'<td>'+data2.city+'</td>'+'<td>'+data2.company+'</td>'+'<td>'+data2.country+'</td>'+'<td>'+data2.course+'</td>'+'<td>'+data2.created+'</td>'+'<td>'+data2.createdtime+'</td>'+'<td>'+data2.currency+'</td>'+'<td>'+data2.description+'</td>'+'<td>'+data2.details+'</td>'+'<td>'+data2.email+'</td>'+'<td>'+data2.error+'</td>'+'<td>'+data2.error_msg+'</td>'+'<td>'+data2.firstname+'</td>'+'<td>'+data2.google_cookie+'</td>'+'<td>'+data2.google_keyword+'</td>'+'<td>'+data2.gs_id+'</td>'+'<td>'+data2.id+'</td>'+'<td>'+data2.lastname+'</td>'+'<td>'+data2.lead_no+'</td>'+'<td>'+data2.leadid+'</td>'+'<td>'+data2.leadsource+'</td>'+'<td>'+data2.leadstatus+'</td></tr>'; 
+
+                        $( "#adddata3_table" ).append( html );
+                        $('#addModal2').modal('hide');
+                        $('#addModal3').modal('show');
+
+                       }
+                    });
+            }
+         }
+       };
+       var add_tran_step1 = function()
+         {
+         $.ajax({
+              url: 'http://localhost:8000/crm_data/',
+              type: 'get',
+              dataType: 'json',
+              data: $('form#add_new_transaction').serialize(),
+              success: function(data) {
+                  if (data.leadid==0){
+                    alert("no leads found...now Create a Lead");
+                  }
+                  else{
+                     if( data.has_multiple_leads == "yes"){
+                           $.ajax({
+                                url: 'http://localhost:8000/gunshots_multiple/'+data.id+'/?format=json',
+                                type: 'get',
+                                dataType: 'json',
+                                data: data.id,
+                                success: function(data1) {
+                                   global_gs_data = data1;
+                                   html="";
+                                   for (var i = 0; i < data1.length; i++) { 
+                     
+                                       html += '<tr><td><input type="checkbox" onclick= "selectgsm('+data1[i].id+')">Select</td><td>'+data1[i].amount+'</td>'+'<td>'+data1[i].assgn_first_name+'</td>'+'<td>'+data1[i].amount+'</td>'+'<td>'+data1[i].campaign_id+'</td>'+'<td>'+data1[i].city+'</td>'+'<td>'+data1[i].company+'</td>'+'<td>'+data1[i].country+'</td>'+'<td>'+data1[i].course+'</td>'+'<td>'+data1[i].created+'</td>'+'<td>'+data1[i].createdtime+'</td>'+'<td>'+data1[i].currency+'</td>'+'<td>'+data1[i].description+'</td>'+'<td>'+data1[i].details+'</td>'+'<td>'+data1[i].email+'</td>'+'<td>'+data1[i].error+'</td>'+'<td>'+data1[i].error_msg+'</td>'+'<td>'+data1[i].firstname+'</td>'+'<td>'+data1[i].google_cookie+'</td>'+'<td>'+data1[i].google_keyword+'</td>'+'<td>'+data1[i].gs_id+'</td>'+'<td>'+data1[i].id+'</td>'+'<td>'+data1[i].lastname+'</td>'+'<td>'+data1[i].lead_no+'</td>'+'<td>'+data1[i].leadid+'</td>'+'<td>'+data1[i].leadsource+'</td>'+'<td>'+data1[i].leadstatus+'</td></tr>'; 
+                                    }
+                                   $( "#adddata2_table" ).append( html );
+                                    $('#addModal1').modal('hide');
+                                     $('#addModal2').modal('show');
+
+                                   console.log(html);
+                                 }
+                            });     
+                     }
+                     else{
+                         $.ajax({
+                                url: 'http://localhost:8000/gunshots/'+data.id+'/?format=json',
+                                type: 'get',
+                                dataType: 'json',
+                                data: data.id,
+                                success: function(data1) {
+                                   global_gs_data = data1;
+                                   html="";
+                                   html += '<tr><td><input type="checkbox" onclick= "selectgs('+data1.id+')">Select</td><td>'+data1.amount+'</td>'+'<td>'+data1.assgn_first_name+'</td>'+'<td>'+data1.amount+'</td>'+'<td>'+data1.campaign_id+'</td>'+'<td>'+data1.city+'</td>'+'<td>'+data1.company+'</td>'+'<td>'+data1.country+'</td>'+'<td>'+data1.course+'</td>'+'<td>'+data1.created+'</td>'+'<td>'+data1.createdtime+'</td>'+'<td>'+data1.currency+'</td>'+'<td>'+data1.description+'</td>'+'<td>'+data1.details+'</td>'+'<td>'+data1.email+'</td>'+'<td>'+data1.error+'</td>'+'<td>'+data1.error_msg+'</td>'+'<td>'+data1.firstname+'</td>'+'<td>'+data1.google_cookie+'</td>'+'<td>'+data1.google_keyword+'</td>'+'<td>'+data1.gs_id+'</td>'+'<td>'+data1.id+'</td>'+'<td>'+data1.lastname+'</td>'+'<td>'+data1.lead_no+'</td>'+'<td>'+data1.leadid+'</td>'+'<td>'+data1.leadsource+'</td>'+'<td>'+data1.leadstatus+'</td></tr>'; 
+                                    
+                                   $( "#adddata2_table" ).append( html );
+                                    $('#addModal1').modal('hide');
+                                     $('#addModal2').modal('show');
+
+                                   console.log(html);
+                                 }
+                            });     
+                     }
+                  }
+               }
+          });     
+            
+         
+
+         };
+       
+      </script>
+      <section class="content">
+         <!-- Sidebar Start -->
+         <div class="sidebar">
+            <!-- Logo Start -->
+            <a href="index.html">
+               <div class="logo-container" id="step1">
+                  <img src="http://www.edupristine.com/wp-content/themes/default/images/Pristine_NewLogo.png" style="vertical-align: initial; margin-top: 5px; margin-left: 45px;" width="80px" height="40px"></img>
+               </div>
+            </a>
+            <!-- Logo End -->
+            <!-- Sidebar User Profile Start -->
+            <div class="sidebar-profile">
+               <div class="user-avatar">
+                  <img src="{{ STATIC_URL }}_demo/images/profile-60x60.jpg" alt="Aayush Jain" width="60px" height="60px" />
+               </div>
+               <div class="user-info">
+                  <a href="profile.html">{{ name }}</a><br/>
+                  <span>Role: CTO</span>
+               </div>
+            </div>
+            <div class="responsive-menu">
+               <a href="#"><i class="fa fa-bars"></i></a>
+            </div>
+            <!-- Sidebar User Profile End -->
+            <!-- Menu Start -->
+            <ul class="menu" id="sidebar_menu">
+            </ul>
+            <!-- Menu End -->
+         </div>
+         <!-- Sidebar End -->
+         <div class="content-liquid-full">
+         <div class="container">
+         <!-- Header Bar Start -->
+         <div class="row header-bar" id="step2">
+            <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 hidden-xs hidden-sm">
+               <ul class="left-icons">
+                  <li><a href="#" class="collapse-sidebar"><i class="fa fa-bars"></i></a></li>
+                  <li><input type="text" class="search" placeholder="Input your search..." /></li>
+                  <li><a href="#"><i class="fa fa-refresh"></i></a></li>
+               </ul>
+            </div>
+            <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
+               <ul class="right-icons" id="step3">
+                  <li>
+                     <a href="#" class="user"><i class="fa fa-user"></i></a>
+                     <ul class="dropdown">
+                        <li><a href="settings.html"><i class="fa fa-cogs"></i>Settings</a></li>
+                        <li><a href="profile.html"><i class="fa fa-user"></i>My Profile</a></li>
+                        <li><a href="login.html"><i class="fa fa-sign-out"></i>Sign Out</a></li>
+                     </ul>
+                  </li>
+                  <li>
+                     <a href="#" class="email">
+                        <i class="fa fa-envelope-o"></i>
+                        <div class="notify">13</div>
+                     </a>
+                     <ul class="dropdown">
+                        <li><a href="#"><i class="fa fa-envelope-o"></i>Inbox</a></li>
+                        <li><a href="#"><i class="fa fa-reply-all"></i>Send</a></li>
+                        <li><a href="#"><i class="fa fa-folder"></i>Draft</a></li>
+                        <li><a href="#"><i class="fa fa-pencil-square-o"></i>Compose</a></li>
+                     </ul>
+                  </li>
+                  <li>
+                     <a href="#" class="info">
+                        <i class="fa fa-info"></i>
+                        <div class="notify">2</div>
+                     </a>
+                     <ul class="dropdown big">
+                        <li>
+                           <a href="#">
+                           <i class="fa fa-check-circle green"></i>
+                           Uploaded successfully
+                           <span class="description">1 minute ago</span>
+                           </a>
+                        </li>
+                        <li>
+                           <a href="#">
+                           <i class="fa fa-comments blue"></i>
+                           Jenna commented on your link
+                           <span class="description">1 hour ago</span>
+                           </a>
+                        </li>
+                        <li>
+                           <a href="#">
+                           <i class="fa fa-calendar orange"></i>
+                           Jason invited you on a event
+                           <span class="description">3 hours ago</span>
+                           </a>
+                        </li>
+                     </ul>
+                  </li>
+                  <li>
+                     <a href="#" class="settings"><i class="fa fa-cog"></i></a>
+                  </li>
+                  <li>
+                     <a href="#" class="lock"><i class="fa fa-lock"></i></a>
+                  </li>
+               </ul>
+            </div>
+         </div>
+         <!-- Header Bar End -->
+         <!--  Main Content -->
+         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="report">
+               <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" align="right">
+                  <h4 class="">{{ current_date }}</h4>
+               </div>
+               <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" align="center">
+                  <h2>Sales Report </h2>
+                  <hr />
+               </div>
+               <div class="row" align="center">
+                  <div>
+                     <button type="button" class="btn btn-round btn-default" data-toggle="modal" data-target="#addModal1"><i class="fa fa-plus"></i> Add Data</button>
+                     <button type="button" class="btn btn-round btn-default" data-toggle="modal" data-target="#emailModal"><i class="fa fa-envelope-o"></i> Email</button>
+                     <div class="btn-group">
+                        <button type="button" class="btn btn-round btn-default dropdown-toggle" data-toggle="dropdown"><i class="fa fa-save"></i> Save Report <span class="caret"></span></button>
+                        <ul class="dropdown-menu" role="menu">
+                           <li><a href='/print_report/'>Pdf</a></li>
+                           <li><a href="#">Excel</a></li>
+                        </ul>
+                     </div>
+                     <div>
+                     </div>
+                     <hr />
+                     <div class="row">
+                        <div class="row" align="center">
+                           <div class="boxed col-lg-2 col-md-2 col-sm-4 col-xs-4">
+                              <div class="row" >
+                                <h3>Monthly</h3>
+                                <h4>Max. Sales</h4>
+                                <h3 class="text-info"> {{monthly_max.amount|safe}}</h3>
+                                <small class="text-light"> in the month <b>{{monthly_max.month|safe}}</b></small>
+                              </div>
+                           </div>
+                           <div class="boxed col-lg-20 col-md-10 col-sm-8 col-xs-8">
+                              <div class="inner">
+                                 <div class="table-holder">
+                                    <table id="basic-table">
+                                       <thead>
+                                          <tr>
+                                             <th>Name</th>
+                                             <th>{{ unique_months.1}}</th>
+                                             <th>{{ unique_months.0}}</th>
+                                             <th>Total Sales</th>
+                                          </tr>
+                                       </thead>
+                                       <tbody>
+                                          {% for d in named_grouped_monthly %}
+                                          <tr>
+                                             <td>{{ d.assgn_first_name }}</td>
+                                             {% for m in d.monthly_data %}
+                                                {% if m.month == unique_months.1 %}
+                                                      <td>{{ m.amount }}</td>
+                                                {% endif %}
+                                             {% endfor %}
+                                             {% for m in d.monthly_data %}
+                                                {% if m.month == unique_months.0 %}
+                                                      <td>{{ m.amount }}</td>
+                                                {% endif %}
+                                             {% endfor %}
+                                             <td>{{ d.total_sales }}</td>
+                                          </tr>
+                                          {% endfor %}
+                                       </tbody>
+                                    </table>
+                                 </div>
+                              </div>
+                              
+                           </div>
+                        </div>
+                        <hr />
+                     </div>
+                     <div class="row">
+                        <div class="row" align="center">
+                           <div class="boxed col-lg-2 col-md-2 col-sm-4 col-xs-4">
+                              <div >
+                                <h3>Daily</h3>
+                                <h4>Max. Sales</h4>
+                                <h3 class="text-info"> {{monthly_max.amount|safe}}</h3>
+                                <small class="text-light"> in the month <b>{{monthly_max.month|safe}}</b></small>
+                              </div>
+                           </div>
+                           <div class="boxed col-lg-20 col-md-10 col-sm-8 col-xs-8">
+                              <div class="inner">
+                                 <div class="table-holder">
+                                    <table id="basic-table">
+                                       <thead>
+                                          <tr>
+                                             <th>Name</th>
+                                             <th>{{ unique_days.3}}</th>
+                                             <th>{{ unique_days.2}}</th>
+                                             <th>{{ unique_days.1}}</th>
+                                             <th>{{ unique_days.0}}</th>
+                                          </tr>
+                                       </thead>
+                                       <tbody>
+                                          {% for d in named_grouped_daily %}
+                                          <tr>
+                                             <td>{{ d.assgn_first_name }}</td>
+                                              {% for m in d.daily_data %}
+                                                {% if m.day == unique_days.3 %}
+                                                      <td>{{ m.amount }}</td>
+                                                {% endif %}
+                                             {% endfor %}
+                                              {% for m in d.daily_data %}
+                                                {% if m.day == unique_days.2 %}
+                                                      <td>{{ m.amount }}</td>
+                                                {% endif %}
+                                             {% endfor %}
+                                             {% for m in d.daily_data %}
+                                                {% if m.day == unique_days.1 %}
+                                                      <td>{{ m.amount }}</td>
+                                                {% endif %}
+                                             {% endfor %}
+                                             {% for m in d.daily_data %}
+                                                {% if m.day == unique_days.0 %}
+                                                      <td>{{ m.amount }}</td>
+                                                {% endif %}
+                                             {% endfor %}
+                                            
+                                          </tr>
+                                          {% endfor %}
+                                       </tbody>
+                                    </table>
+                                 </div>
+                              </div>
+                              
+                           </div>
+                        </div>
+                        <hr />
+                     </div>
+                     <div class="row">
+                        <div class="boxed col-lg-2 col-md-2 col-sm-4 col-xs-4">
+                           <div >                                 
+                              <h4>Sales Count</h4>
+                              <h1 class="text-info">234</h1>
+                              <small class="text-light">View total number of sales in last day.</small>
+                           </div>
+                        </div>
+                        <div class="boxed col-lg-20 col-md-10 col-sm-8 col-xs-8">
+                           <div class="inner" style="min-height: 230px;">
+                              <div id="regression_container" style="height:400px;"></div>
+                           </div>
+                        </div>
+                     </div>
+                     <hr />
+                     <div class="row">
+                        <div class="boxed col-lg-2 col-md-2 col-sm-4 col-xs-4">
+                           <div >
+                              <h4>Max Sales</h4>
+                              <h3 class="text-info">97501</h3>
+                              <small class="text-light">By <b>Junk</b> in <b>3/2014</b></small>
+                           </div>
+                        </div>
+                        <div class="boxed col-lg-20 col-md-10 col-sm-8 col-xs-8">
+                           <div class="inner" style="min-height: 230px;">
+                              <div id="bar_container" style="height:400px;"></div>
+                           </div>
+                        </div>
+                     </div>
+                     <hr />
+                     <div class="row">
+                        <div class="boxed col-lg-2 col-md-2 col-sm-4 col-xs-4">
+                           <div >
+                              <h4>Lead Count</h4>
+                              <h1 class="text-info">234</h1>
+                              <small class="text-light">View total number of leads in last day.</small>
+                           </div>
+                        </div>
+                        <div class="boxed col-lg-20 col-md-10 col-sm-8 col-xs-8">
+                           <div class="inner" style="min-height: 230px;">
+                              <div id="baseline_container" style="height:400px;"></div>
+                           </div>
+                        </div>
+                     </div>
+                     <hr />
+                     <div class="row">
+                        <div class="boxed col-lg-2 col-md-2 col-sm-4 col-xs-4">
+                           <div >
+                              <h4>Lead Count</h4>
+                              <h1 class="text-info">234</h1>
+                              <small class="text-light">View total number of leads in last day.</small>
+                           </div>
+                        </div>
+                        <div class="boxed col-lg-20 col-md-10 col-sm-8 col-xs-8">
+                           <div class="inner" style="min-height: 230px;">
+                              <div id="pie_container" style="height:400px;"></div>
+                           </div>
+                        </div>
+                     </div>
+                     <hr />
+                     <div align="center"><button type="button" class="btn btn-success" data-toggle="modal" data-target="#verifyModal">Verify Data</button></div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </section>
+      <!-- Verify Data Modal -->
+      <div class="modal fade" id="verifyModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+         <div class="modal-dialog">
+            <div class="modal-content">
+               <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                  <h4 class="modal-title" id="myModalLabel">Verify Data</h4>
+               </div>
+               <div class="modal-body">
+                  <table id="basic-table">
+                     <thead>
+                        <tr>
+                           <th>Lead no</th>
+                           <th>Phone</th>
+                           <th>Email</th>
+                           <th>Verification</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                  {% for gs in gs_objects %}
+                   <tr>
+                     <td>{{ gs.lead_no }}</td>
+                     <td>{{ gs.phone }}</td>
+                     <td>{{ gs.email }}</td>
+                     <td><span class="badge btn-success">Verified</span></td>
+                  </tr>
+                  
+                                      
+                  {% endfor %}
+                   </tbody>
+                  </table>
+               </div>
+               <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-primary">Save changes</button>
+               </div>
+            </div>
+         </div>
+      </div>
+      <!-- Add Data Modal -->
+      <div class="modal fade" id="addModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+         <div class="modal-dialog">
+            <div class="modal-content">
+               <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                  <h4 class="modal-title" id="myModalLabel">Add New Transaction Data</h4>
+               </div>
+               <div class="modal-body">
+                  <form class="form-horizontal" id="add_new_transaction" name="add_new_transaction">
+                    <div class="form-group">
+                     <label for="udf3" class="col-sm-2 control-label">Name</label>
+                      <div class="col-sm-4">
+                        <input type="text" class="form-control" name="udf3" placeholder="Name">
+                      </div>
+                      <label for="udf1" class="col-sm-2 control-label">Email</label>
+                      <div class="col-sm-4">
+                        <input type="email" class="form-control" name="udf1" placeholder="Email">
+                      </div>
+                      <label for="phone" class="col-sm-2 control-label">Phone</label>
+                      <div class="col-sm-4">
+                        <input type="text" class="form-control" name="phone" placeholder="Phone Number">
+                      </div>
+                      <label for="udf2" class="col-sm-2 control-label">Address</label>
+                      <div class="col-sm-4">
+                        <input type="text" class="form-control" name="udf2" placeholder="Address">
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="payment_id" class="col-sm-2 control-label">Payment Id</label>
+                      <div class="col-sm-4">
+                        <input type="text" class="form-control" name="payment_id" placeholder="Payment Id">
+                      </div>
+                      <label for="tran_id" class="col-sm-2 control-label">Transaction Id</label>
+                      <div class="col-sm-4">
+                        <input type="text" class="form-control" name="tran_id" placeholder="Transaction Id">
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="currency" class="col-sm-2 control-label">Currency</label>
+                      <div class="col-sm-4">
+                        <input type="text" class="form-control" name="currency" placeholder="Currency">
+                      </div>
+                      <label for="amount" class="col-sm-2 control-label">Amount</label>
+                      <div class="col-sm-4">
+                        <input type="text" class="form-control" name="amount" placeholder="Amount">
+                      </div>
+                    </div>
+                    <div class="form-group">
+                    <label for="source" class="col-sm-2 control-label">Source</label>
+                      <div class="col-sm-4">
+                        <input type="text" class="form-control" name="source" placeholder="Source">
+                      </div>
+                     <label for="created" class="col-sm-2 control-label">Date</label>
+                      <div class="col-sm-4">
+                        <input type="text" class="form-control" name="created" placeholder="DD/MM/YYYY">
+                      </div>
+                      <label for="udf5" class="col-sm-2 control-label">Product</label>
+                      <div class="col-sm-4">
+                        <input type="text" class="form-control" name="udf5" placeholder="Product">
+                      </div>
+                      <label for="product_id" class="col-sm-2 control-label">Product Id</label>
+                      <div class="col-sm-4">
+                        <input type="text" class="form-control" name="product_id" placeholder="Product Id">
+                        <input type="hidden" class="form-control" name="result" value ="CAPTURED">
+                        <input type="hidden" class="form-control" name="leadid" value ="0">
+                        <input type="hidden" class="form-control" name="smownerid" value ="0">
+                        <input type="hidden" class="form-control" name="payments_hdfc_id" value ="0">
+                        <input type="hidden" class="form-control" name="createdtime" value ="2014-05-22T12:47:46">
+                        <input type="hidden" class="form-control" name="modifiedtime" value ="2014-05-22T12:47:46">
+                      </div>
+                    </div>
+                     <div class="form-group">
+                      <label for="details" class="col-sm-2 control-label">Details</label>
+                      <div class="col-sm-10">
+                        <input type="textarea" class="form-control" name="details" placeholder="Details">
+                      </div>
+                    </div>
+                    <!--<div class="form-group">
+                      <div class="col-sm-offset-2 col-sm-10">
+                        <button type="submit" class="btn btn-default">Sign in</button>
+                      </div>
+                    </div>-->
+                  </form>
+               </div>
+               <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                  <button type="button" onclick="add_tran_step1();" class="btn btn-success">Next -></button>
+               </div>
+            </div>
+         </div>
+      </div>
+      <!-- Email Modal -->
+      <div class="modal fade" id="emailModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+         <div class="modal-dialog">
+            <div class="modal-content">
+               <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                  <h4 class="modal-title" id="myModalLabel">Email this report</h4>
+               </div>
+               <div class="modal-body">
+                  <div class="inner no-radius">
+                     <form method="post" class="basic-form">
+                        <div class="row">
+                           <div class="col-md-12">
+                              <label for="email">E-Mail:</label>
+                              <input type="text" name="email" id="email" placeholder="Recipient's email">
+                           </div>
+                           <div class="col-md-12">
+                              <label for="subject">Subject:</label>
+                              <input type="text" name="subject" id="subject" placeholder="Subject">
+                           </div>
+                        </div>
+                        <div class="row">
+                           <div class="col-md-12">
+                              <label for="format">Report format:</label>
+                              <select id="dropdown" name="dropdown">
+                                 <option selected="selected" value="1">PDF</option>
+                                 <option value="2">Excel</option>
+                              </select>
+                           </div>
+                        </div>
+                     </form>
+                  </div>
+               </div>
+               <div class="modal-footer">
+                  <button type="button" class="btn btn-lg btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Discard</button>
+                  <button type="button" class="btn btn-lg btn-default" data-dismiss="modal"><i class="fa fa-check"></i> Send mail</button>
+               </div>
+            </div>
+         </div>
+      </div>
+      <!-- Add lead data 2 Modal -->
+      <div class="modal fade" id="addModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+         <div class="modal-dialog">
+            <div class="modal-content">
+               <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                  <h4 class="modal-title" id="myModalLabel">Select Lead</h4>
+               </div>
+               <div class="modal-body">
+                  <div class="inner no-radius">
+                      <div class="table-holder">
+                      <div class="table-responsive" style="overflow: auto">
+                                    <table id="table-bordered">
+                                       <thead>
+                                          <tr>
+                                             <th>Verify </th>
+                                             <th>Lead no</th>
+                                             <th>Phone</th>
+                                             <th>Email</th>
+                                             <th>Verification</th>
+                                             <th>Lead no</th>
+                                             <th>Phone</th>
+                                             <th>Email</th>
+                                             <th>Verification</th>
+                                             <th>Lead no</th>
+                                             <th>Phone</th>
+                                             <th>Email</th>
+                                             <th>Verification</th>
+                                             <th>Lead no</th>
+                                             <th>Phone</th>
+                                             <th>Email</th>
+                                             <th>Verification</th>
+                                          </tr>
+                                       </thead>
+                                       <tbody id="adddata2_table">
+                                          
+                                       </tbody>
+                                    </table>
+                      </div>
+                                 </div>
+                  </div>
+               </div>
+               <div class="modal-footer">
+                  
+               </div>
+            </div>
+         </div>
+      </div>
+      <div class="modal fade" id="addModal3" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+         <div class="modal-dialog">
+            <div class="modal-content">
+               <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                  <h4 class="modal-title" id="myModalLabel">Verify Data</h4>
+               </div>
+               <div class="modal-body">
+                  <div class="inner no-radius">
+                      <div class="table-holder">
+                      <div class="table-responsive" style="overflow: auto">
+                                    <table id="table-bordered">
+                                       <thead>
+                                          <tr>
+                                             <th>Verify </th>
+                                             <th>Lead no</th>
+                                             <th>Phone</th>
+                                             <th>Email</th>
+                                             <th>Verification</th>
+                                             <th>Lead no</th>
+                                             <th>Phone</th>
+                                             <th>Email</th>
+                                             <th>Verification</th>
+                                             <th>Lead no</th>
+                                             <th>Phone</th>
+                                             <th>Email</th>
+                                             <th>Verification</th>
+                                             <th>Lead no</th>
+                                             <th>Phone</th>
+                                             <th>Email</th>
+                                             <th>Verification</th>
+                                          </tr>
+                                       </thead>
+                                       <tbody id="adddata3_table">
+                                          
+                                       </tbody>
+                                    </table>
+                      </div>
+                                 </div>
+                  </div>
+               </div>
+               <div class="modal-footer">
+                  
+               </div>
+            </div>
+         </div>
+      </div>
+      {% include 'includes/footer.html'%}
+      
+   </body>
+</html>
