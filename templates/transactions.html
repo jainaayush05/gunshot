@@ -1,0 +1,170 @@
+<!doctype html>
+<html class="fuelux" lang="en">
+   {% include 'includes/header.html' %} 
+   <body>
+      <script type="text/javascript">
+      var load_gunshot = function(email,phone){
+          $.ajax({
+                       url: '{{root_url}}gunshots/?email='+email+'&phone='+phone+'&format=json',
+                       type: 'get',
+                       dataType: 'json',
+                       data: {},
+                       success: function(data) {
+                        alert(data);
+                        if (data[0].has_multiple_leads =="yes"){
+                           $.ajax({
+                                   url: '{{root_url}}gunshots_multiple/?email='+email+'&phone='+phone+'&format=json',
+                                   type: 'get',
+                                   dataType: 'json',
+                                   data: {},
+                                   success: function(data1) {
+                                    alert(data1.length);
+                                     //$('#modal1').modal('show');
+                                    }
+                                   });
+                        }
+                        else{
+                           alert('no')
+                        }
+
+                        //$('#modal1').modal('show');
+                     }
+                 });
+
+      };
+      </script>
+      <section class="content">
+         <!-- Sidebar Start -->
+         <div class="sidebar">
+            <!-- Logo Start -->
+            <a href="/dashboard">
+               <div class="logo-container" id="step1">
+                  <img src="http://www.edupristine.com/wp-content/themes/default/images/Pristine_NewLogo.png" style="vertical-align: initial; margin-top: 5px; margin-left: 45px;" width="80px" height="40px"></img>
+               </div>
+            </a>
+            <!-- Logo End -->
+            <!-- Sidebar User Profile Start -->
+            <div class="sidebar-profile">
+               <div class="user-avatar">
+                  <img src="{{ STATIC_URL }}_demo/images/profile-60x60.jpg" alt="Aayush Jain" width="60px" height="60px" />
+               </div>
+               <div class="user-info">
+                  <a href="profile.html">{{ name }}</a><br/>
+                  <span>Role: Intern</span>
+               </div>
+            </div>
+            <div class="responsive-menu">
+               <a href="#"><i class="fa fa-bars"></i></a>
+            </div>
+            <!-- Sidebar User Profile End -->
+            <!-- Menu Start -->
+            <ul class="menu" id="sidebar_menu">
+            </ul>
+            <!-- Menu End -->
+         </div>
+         <!-- Sidebar End -->
+         <div class="content-liquid-full">
+         <div class="container">
+         <!-- Header Bar Start -->
+         <div class="row header-bar" id="step2">
+            <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 hidden-xs hidden-sm">
+               <ul class="left-icons">
+                  <li><a href="#" class="collapse-sidebar"><i class="fa fa-bars"></i></a></li>
+                  <li><input type="text" class="search" placeholder="Input your search..." /></li>
+                  <li><a href="#"><i class="fa fa-refresh"></i></a></li>
+               </ul>
+            </div>
+            <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
+               <ul class="right-icons" id="step3">
+                  <li>
+                     <a href="/logout" class="lock"><i class="fa fa-lock"></i></a>
+                  </li>
+               </ul>
+            </div>
+         </div>
+         <!-- Header Bar End -->
+         <!--  Main Content -->
+         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="report">
+               <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" align="right">
+                  <h4 class="">{{ current_date }}</h4>
+               </div>
+               <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" align="center">
+                  <h2>Transactions</h2>
+                  <hr />
+               </div>
+
+               <div class="row" align="center">
+                  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" align="center">
+                     <div class="table-holder" >
+                         <div class="table-responsive" style="overflow: auto">
+                           <table class="table-bordered" id="tablular_view" >
+                           <thead>
+                              <th>Verification</th>
+                              <th>Created</th>
+                              <th>Email</th>
+                              <th>Phone</th>
+                              <th>Payments HDFC</th>
+                              <th>Currency</th>
+                              <th>Amount</th>
+                              <th>PaymentId</th>
+                              <th>TranID</th>
+                              <th>Address</th>
+                              <th>Name</th>
+                              <th>Comments</th>
+                              <th>Course</th>
+
+                           </thead> 
+                           <tbody>
+                           {% for gso in gs %}
+                              <tr>
+                              <td><a href="#" class="btn btn-xs btn-success" onclick='load_gunshot("{{gso.udf1}}","{{gso.phone}}");'>Verify</a></td>
+                              <td>{{gso.created}}</td>
+                              <td>{{gso.udf1}}</td>
+                              <td>{{gso.phone}}</td>
+                              <td>{{gso.payments_hdfc_id}}</td>
+                              <td>{{gso.currency}}</td>
+                              <td>{{gso.amount}}</td>
+                              <td>{{gso.payment_id}}</td>
+                              <td>{{gso.tran_id}}</td>
+                              <td>{{gso.udf2}}</td>
+                              <td>{{gso.udf3}}</td>
+                              <td>{{gso.udf4}}</td>
+                              <td>{{gso.udf5}}</td>
+                              
+                              <tr>
+                           {%endfor%}
+                           </tbody>
+                        </table>
+                     </div>
+                  </div>
+
+                     <hr />
+                  </div>
+               </div>
+            </div>
+         </div>
+      </section>
+      <div class="modal fade" id="modal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+         <div class="modal-dialog">
+            <div class="modal-content">
+               <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                  <h4 class="modal-title" id="myModalLabel">Verify Data</h4>
+               </div>
+               <div class="modal-body">
+                  <div class="inner no-radius">
+                      
+                  </div>
+               </div>
+               <div class="modal-footer">
+                  
+               </div>
+            </div>
+         </div>
+      </div>
+    
+      {% include 'includes/footer.html'%}
+      
+   </body>
+</html>

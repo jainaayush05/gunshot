@@ -1,28 +1,6 @@
 <!doctype html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Gunshot - Edupristine</title>
-
-  <link rel="stylesheet" type="text/css" href="assets/bootstrap/css/bootstrap.min.css">
-  <link rel="stylesheet" type="text/css" href="assets/font-awesome/css/font-awesome.min.css">
-  <link rel="stylesheet" type="text/css" href="css/style.css">
-  <link rel="stylesheet" type="text/css" href="css/responsive.css">
-  <link rel="stylesheet" type="text/css" href="css/animate.css">
-
-  <!-- Google Fonts -->
-  <link href='http://fonts.googleapis.com/css?family=Lobster' rel='stylesheet' type='text/css'>
-  <link href='http://fonts.googleapis.com/css?family=Lato:400,300,700,700italic,900,100' rel='stylesheet' type='text/css'>
-
-  <!--[if lt IE 9]>
-  <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-  <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
-  <![endif]-->
-
-
-</head>
+{% include 'includes/header.html' %}
 
 <body class="login-page">
 
@@ -45,19 +23,33 @@
                 <h4>Login to your account</h4>
                 <h5>Please enter your Vtiger credentials</h5>
               </div>
+              <script>
+                   var login_form = function(){
+                      $.ajax({
+                              url: '/authentication/',
+                              type: 'get',
+                              dataType: 'json',
+                              data: $('form#login').serialize(),
+                              success: function(data) {
+                                            window.location.href = "../login";
+                                       },
 
+                          });     
+                   };
+              </script>
+              <form id="login" name="login">
               <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-user"></i></span>
-                <input type="text" class="form-control" placeholder="Username" />
+                <input type="text" id="uname" name="uname" class="form-control" placeholder="Username" />
               </div>
 
               <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-lock"></i></span>
-                <input type="password" class="form-control" placeholder="Password" />
+                <input type="password" id="pass" name="pass" class="form-control" placeholder="Password" />
               </div>
 
-              <input type="submit" class="btn btn-lg btn-success" value="Login to your account" name="submit" id="submit" />
-
+              <input class="btn btn-lg btn-success" value="Login to your account" onclick="login_form();" name="submit" id="submit" />
+              </form>
               <p class="footer">Copyright EduPristine 2014<br/>Neev Knowledge Management Pvt Ltd.</p>
 
             </div>

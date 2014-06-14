@@ -1,9 +1,10 @@
 <!doctype html>
 <html class="fuelux" lang="en">
-   {% include 'includes/header.html' %}
+   {% include 'includes/header.html' %} 
    <body>
       <script type="text/javascript">
-       $(function () { $("input,select,textarea").not("[type=submit]").jqBootstrapValidation(); } );
+       var assigned_name='';
+       var region = '';
         $( document ).ready(function() {
          load_sidebar();
          {{pie_max|safe}}
@@ -24,31 +25,73 @@
        var global_gsm_data;
        var global_gs_data;
        var verifygs= function(gs_id){
-         global_gs_data['verified'] = "yes";
-          $.ajax({
-                       url: 'http://localhost:8000/gunshots/'+gs_id,
+          global_gs_data['verified'] = "yes";
+           $.ajax({
+                       url: '{{root_url}}gunshots/'+gs_id,
                        type: 'put',
                        dataType: 'json',
                        data: global_gs_data,
                        success: function(data3) {
-                        alert('Verification Successful!');
+                        alert('Verification Successful! Wait for lead creation');
+                        console.log(data3);
+                        if(data3.leadid ==0){
+                          var data_string ='moduleName=Leads&cf_733=International&cf_729=Email Marketing&leadsource='+data3.leadsource+'&firstname='+data3.firstname+'&lastname='+data3.lastname+'&phone='+data3.phone+'&email='+data3.udf1+'&description='+data3.description+'&company='+data3.company+'&cf_679='+data3.traffic_src+'&leadstatus='+data3.leadstatus+'&cf_710=Hot- Untouched&cf_607='+data3.course+'&city='+data3.city+'&country='+data3.country;
+
+                          var data_string1='moduleName=Accounts&accountname='+data3.firstname+' '+data3.lastname+'&email1='+data3.udf1+'&phone='+data3.phone+'&cf_611='+data3.course+'&cf_612=-&bill_street=-&bill_city='+data3.city+'&bill_country='+data3.country+'&cf_731=';
+                          $.ajax({
+                                       url: '/create_lead/',
+                                       type: 'post',
+                                       dataType: 'json',
+                                       data: {"region":region,"assigned_name":assigned_name,"gs_id":gs_id,"lead_data":data_string,"account_data": data_string1, "email": data3.udf1},
+                                       success: function(data4) {
+                                        alert('Lead Pushed');
+                                          console.log(data4)
+                                         window.location.href = "/sales_report";
+                                        $('#addModal3').modal('hide');
+                                        $('#addModal2').modal('hide');
+                                     }
+                                 });
+                        }
+                       // window.location.href = "/sales_report";
                         $('#addModal3').modal('hide');
                      }
                  });
+            
        };
 
-       var selectgs =function(gsm_id){
+       //No selection- Just verification if only single lead found
+       var selectgs =function(gs_id){
             global_gs_data['verified'] = "yes";
-            $.ajax({
-                         url: 'http://localhost:8000/gunshots/'+global_gs_data['id'],
-                         type: 'put',
-                         dataType: 'json',
-                         data: global_gs_data,
-                         success: function(data3) {
-                          alert('Verification Successful!');
-                          $('#addModal3').modal('hide');
-                       }
-                   });   
+           $.ajax({
+                       url: '{{root_url}}gunshots/'+gs_id,
+                       type: 'put',
+                       dataType: 'json',
+                       data: global_gs_data,
+                       success: function(data3) {
+                        alert('Verification Successful! Wait for lead creation');
+                        console.log(data3);
+                        if(data3.leadid ==0){
+                          var data_string ='moduleName=Leads&cf_733=International&cf_729=Email Marketing&leadsource='+data3.leadsource+'&firstname='+data3.firstname+'&lastname='+data3.lastname+'&phone='+data3.phone+'&email='+data3.udf1+'&description='+data3.description+'&company='+data3.company+'&cf_679='+data3.traffic_src+'&leadstatus='+data3.leadstatus+'&cf_710=Hot- Untouched&cf_607='+data3.course+'&city='+data3.city+'&country='+data3.country;
+
+                          var data_string1='moduleName=Accounts&accountname='+data3.firstname+' '+data3.lastname+'&email1='+data3.udf1+'&phone='+data3.phone+'&cf_611='+data3.course+'&cf_612=-&bill_street=-&bill_city='+data3.city+'&bill_country='+data3.country+'&cf_731=';
+                          $.ajax({
+                                       url: '/create_lead/',
+                                       type: 'post',
+                                       dataType: 'json',
+                                       data: {"region":region,"assigned_name":assigned_name,"gs_id":gs_id,"lead_data":data_string,"account_data": data_string1, "email": data3.udf1},
+                                       success: function(data4) {
+                                        alert('Lead Pushed');
+                                          console.log(data4)
+                                        window.location.href = "/sales_report";
+                                        $('#addModal3').modal('hide');
+                                        $('#addModal2').modal('hide');
+                                     }
+                                 });
+                        }
+                       // window.location.href = "/sales_report";
+                        $('#addModal3').modal('hide');
+                     }
+                 });
             
          
        };
@@ -60,7 +103,7 @@
                var key = "gs_id";
                delete global_gsm_data[i]["gs_id"];
                 $.ajax({
-                       url: 'http://localhost:8000/gunshots/'+global_gsm_data[i].id,
+                       url: '{{root_url}}/gunshots/'+global_gsm_data[i].id,
                        type: 'put',
                        dataType: 'json',
                        data: global_gsm_data[i],
@@ -80,24 +123,25 @@
        };
        var add_tran_step1 = function()
          {
+          assigned_name = $('#assigned_to').find(":selected").val();
+          region = $('#region').find(":selected").val();
+          
          $.ajax({
-              url: 'http://localhost:8000/crm_data/',
+              url: '{{root_url}}/crm_data/',
               type: 'get',
               dataType: 'json',
               data: $('form#add_new_transaction').serialize(),
               success: function(data) {
-                  if (data.leadid==0){
-                    alert("no leads found...now Create a Lead");
-                  }
-                  else{
+                  
+                  
                      if( data.has_multiple_leads == "yes"){
                            $.ajax({
-                                url: 'http://localhost:8000/gunshots_multiple/'+data.id+'/?format=json',
+                                url: '{{root_url}}/gunshots_multiple/'+data.id+'/?format=json',
                                 type: 'get',
                                 dataType: 'json',
                                 data: data.id,
                                 success: function(data1) {
-                                   global_gs_data = data1;
+                                   global_gsm_data = data1;
                                    html="";
                                    for (var i = 0; i < data1.length; i++) { 
                      
@@ -113,7 +157,7 @@
                      }
                      else{
                          $.ajax({
-                                url: 'http://localhost:8000/gunshots/'+data.id+'/?format=json',
+                                url: '{{root_url}}/gunshots/'+data.id+'/?format=json',
                                 type: 'get',
                                 dataType: 'json',
                                 data: data.id,
@@ -130,7 +174,7 @@
                                  }
                             });     
                      }
-                  }
+                  
                }
           });     
             
@@ -143,7 +187,7 @@
          <!-- Sidebar Start -->
          <div class="sidebar">
             <!-- Logo Start -->
-            <a href="index.html">
+            <a href="/dashboard">
                <div class="logo-container" id="step1">
                   <img src="http://www.edupristine.com/wp-content/themes/default/images/Pristine_NewLogo.png" style="vertical-align: initial; margin-top: 5px; margin-left: 45px;" width="80px" height="40px"></img>
                </div>
@@ -156,7 +200,7 @@
                </div>
                <div class="user-info">
                   <a href="profile.html">{{ name }}</a><br/>
-                  <span>Role: CTO</span>
+                  <span>Role: Intern</span>
                </div>
             </div>
             <div class="responsive-menu">
@@ -183,59 +227,7 @@
             <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
                <ul class="right-icons" id="step3">
                   <li>
-                     <a href="#" class="user"><i class="fa fa-user"></i></a>
-                     <ul class="dropdown">
-                        <li><a href="settings.html"><i class="fa fa-cogs"></i>Settings</a></li>
-                        <li><a href="profile.html"><i class="fa fa-user"></i>My Profile</a></li>
-                        <li><a href="login.html"><i class="fa fa-sign-out"></i>Sign Out</a></li>
-                     </ul>
-                  </li>
-                  <li>
-                     <a href="#" class="email">
-                        <i class="fa fa-envelope-o"></i>
-                        <div class="notify">13</div>
-                     </a>
-                     <ul class="dropdown">
-                        <li><a href="#"><i class="fa fa-envelope-o"></i>Inbox</a></li>
-                        <li><a href="#"><i class="fa fa-reply-all"></i>Send</a></li>
-                        <li><a href="#"><i class="fa fa-folder"></i>Draft</a></li>
-                        <li><a href="#"><i class="fa fa-pencil-square-o"></i>Compose</a></li>
-                     </ul>
-                  </li>
-                  <li>
-                     <a href="#" class="info">
-                        <i class="fa fa-info"></i>
-                        <div class="notify">2</div>
-                     </a>
-                     <ul class="dropdown big">
-                        <li>
-                           <a href="#">
-                           <i class="fa fa-check-circle green"></i>
-                           Uploaded successfully
-                           <span class="description">1 minute ago</span>
-                           </a>
-                        </li>
-                        <li>
-                           <a href="#">
-                           <i class="fa fa-comments blue"></i>
-                           Jenna commented on your link
-                           <span class="description">1 hour ago</span>
-                           </a>
-                        </li>
-                        <li>
-                           <a href="#">
-                           <i class="fa fa-calendar orange"></i>
-                           Jason invited you on a event
-                           <span class="description">3 hours ago</span>
-                           </a>
-                        </li>
-                     </ul>
-                  </li>
-                  <li>
-                     <a href="#" class="settings"><i class="fa fa-cog"></i></a>
-                  </li>
-                  <li>
-                     <a href="#" class="lock"><i class="fa fa-lock"></i></a>
+                     <a href="/logout" class="lock"><i class="fa fa-lock"></i></a>
                   </li>
                </ul>
             </div>
@@ -526,13 +518,140 @@
                       </div>
                     </div>
                     <div class="form-group">
+                      <label for="converted_amount" class="col-sm-2 control-label">Converted Amount</label>
+                      <div class="col-sm-4">
+                        <input type="text" class="form-control" name="converted_amount" placeholder="Converted Amount">
+                      </div>
+                      <label for="assigned_to" class="col-sm-2 control-label">Assigned To</label>
+                      <div class="col-sm-4">
+                        <select id="assigned_to" name="assigned_to">
+                                <option value="" selected="">Please select</option>
+                                <option value="4024">Aastha -</option>
+                                <option value="3912">Abhinav Suman</option>
+                                <option value="367">Abhishek Walekar</option>
+                                <option value="3913">Aditya Gupta</option>
+                                <option value="1">Admin Overall</option>
+                                <option value="3949">Admin India</option>
+                                <option value="3950">Admin International</option>
+                                <option value="3968">Akil Sayed</option>
+                                <option value="3945">akriti Kumari</option>
+                                <option value="3967">Akshay Khandekar</option>
+                                <option value="2800">Alankar Srivastav</option>
+                                <option value="3978">Alok Sharma</option>
+                                <option value="4005">Amir Khan</option>
+                                <option value="3938">Amritesh Saxena</option>
+                                <option value="2313">Anil Grewal</option>
+                                <option value="4001">Anju Yadav</option>
+                                <option value="4017">Anju Mehta</option>
+                                <option value="4003">Ankita Patil</option>
+                                <option value="3989">Anushree Rathod</option>
+                                <option value="6">Atul Kumar</option>
+                                <option value="3924">Austin Fernandes</option>
+                                <option value="2314">Avinash Birader</option>
+                                <option value="3992">Azhar Mukadam</option>
+                                <option value="4026">Batul Dahodwala</option>
+                                <option value="3987">beauty singh</option>
+                                <option value="4000">Bhagyashree Thenge</option>
+                                <option value="4031">Chander Parkash</option>
+                                <option value="3961">Dattatray Gharge</option>
+                                <option value="4010">Dewal Gupta</option>
+                                <option value="308">Dikshu Bishnoi</option>
+                                <option value="3981">dinesh bisht</option>
+                                <option value="4023">drishti -</option>
+                                <option value="4007">Edin Samuel Raju</option>
+                                <option value="4032">Farheen Shaikh</option>
+                                <option value="3991">Farzin Sidhwa</option>
+                                <option value="3984">Foram Patel</option>
+                                <option value="2317">Gaurav Singla</option>
+                                <option value="4012">Harleen Kaur</option>
+                                <option value="3922">Harshal Shah</option>
+                                <option value="3934">Hema Joshi</option>
+                                <option value="3933">Himangshu Sikdar</option>
+                                <option value="4028">himanshu Kumar</option>
+                                <option value="370">Irfan Mohammad</option>
+                                <option value="4015">Ismat Shaikh</option>
+                                <option value="3983">James Stanley</option>
+                                <option value="3915">Jaya Lakshmi</option>
+                                <option value="3959">jitendra chauhan</option>
+                                <option value="3920">Junk Leads</option>
+                                <option value="4033">Kanav Sood</option>
+                                <option value="3985">Kaveri Shivkar</option>
+                                <option value="3948">Kavita Sikdar</option>
+                                <option value="4006">Koyang Hage</option>
+                                <option value="4004">Linkedin Marketing</option>
+                                <option value="3918">Loveleena Kukereja</option>
+                                <option value="301">Maitri Savla</option>
+                                <option value="4030">Malika Jain</option>
+                                <option value="3929">Manish Thapliyal</option>
+                                <option value="3941">Manish Gupta</option>
+                                <option value="3964">Manish Thapliyal</option>
+                                <option value="3957">Megha Gaikwad</option>
+                                <option value="4014">Megha Gupta</option>
+                                <option value="2312">Mukesh Agrawal</option>
+                                <option value="4027">Munmun Chakraborty</option>
+                                <option value="3925">muskan manchanda</option>
+                                <option value="3936">Namita Shah</option>
+                                <option value="3937">Nathan Phillips</option>
+                                <option value="4019">Neha shrivastava</option>
+                                <option value="3997">Nidhi Singh</option>
+                                <option value="3951">Niraj Singh</option>
+                                <option value="3940">Nitin Yadav</option>
+                                <option value="3939">Onkar Tamboli</option>
+                                <option value="3943">Paramdeep Singh</option>
+                                <option value="3973">Pooja Chavan</option>
+                                <option value="4021">Prabuddha --</option>
+                                <option value="3996">Prajkta Tawde</option>
+                                <option value="3958">Pranali Gosavi</option>
+                                <option value="4008">Prathamesh Bhalerao</option>
+                                <option value="3988">prithaa govindraj</option>
+                                <option value="3980">Priya Lad</option>
+                                <option value="4016">Priyanka --</option>
+                                <option value="3917">Rahul Chauhan</option>
+                                <option value="3994">Rahul Chiplunkar</option>
+                                <option value="4029">rahul Kumar Pandit</option>
+                                <option value="3963">Reshmi Pal</option>
+                                <option value="4013">Rizwan Shaikh</option>
+                                <option value="4018">Rizwana Memon</option>
+                                <option value="3935">Rohit Mishra</option>
+                                <option value="3931">Ruchi Singh</option>
+                                <option value="3930">Rudra Pratap Singh</option>
+                                <option value="3927">Sachin Chaurasia</option>
+                                <option value="3998">Sachin Kumar</option>
+                                <option value="307">Sanjay Adhikari</option>
+                                <option value="4011">Sanket Surve</option>
+                                <option value="305">Sarita Chand</option>
+                                <option value="3986">Shagufta Shaikh</option>
+                                <option value="3962">SHAILJA Mehta</option>
+                                <option value="3965">Shaleen Kaushal</option>
+                                <option value="3995">Manish Sheoran</option>
+                                <option value="3972">Shubhangi Pednekar</option>
+                                <option value="3969">Sneha Shetty</option>
+                                <option value="3982">Sohil Panjwani</option>
+                                <option value="3960">Sonia Rajak</option>
+                                <option value="3993">subhash --</option>
+                                <option value="3956">Sukanya Kanade</option>
+                                <option value="4002">Sumanth -</option>
+                                <option value="3916">Sunil Sharma</option>
+                                <option value="3966">Sunita Das</option>
+                                <option value="2316">Suraj --</option>
+                                <option value="3921">Surendra Parmar</option>
+                                <option value="3914">Sushma Kumari</option>
+                                <option value="3932">swapnil s</option>
+                                <option value="2319">Varun Rawat</option>
+                                <option value="3928">Vivek Claudius</option>
+                                <option value="3947">Vivek Sethi</option>
+                                <option value="3977">Viyanza Babu</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="form-group">
                     <label for="source" class="col-sm-2 control-label">Source</label>
                       <div class="col-sm-4">
                         <input type="text" class="form-control" name="source" placeholder="Source">
                       </div>
                      <label for="created" class="col-sm-2 control-label">Date</label>
                       <div class="col-sm-4">
-                        <input type="text" class="form-control" name="created" placeholder="DD/MM/YYYY">
+                        <input type="text" class="form-control" name="created" value ="2012-08-07T19:48:10"placeholder="DD/MM/YYYY">
                       </div>
                       <label for="udf5" class="col-sm-2 control-label">Product</label>
                       <div class="col-sm-4">
@@ -551,8 +670,16 @@
                     </div>
                      <div class="form-group">
                       <label for="details" class="col-sm-2 control-label">Details</label>
-                      <div class="col-sm-10">
+                      <div class="col-sm-4">
                         <input type="textarea" class="form-control" name="details" placeholder="Details">
+                      </div>
+                      <label for="region" class="col-sm-2 control-label">Region</label>
+                      <div class="col-sm-4">
+                        <select id="region" name="region">
+                                <option value="" selected="">Please select</option>
+                                <option value="national">National</option>
+                                <option value="international">International</option>
+                        </select>
                       </div>
                     </div>
                     <!--<div class="form-group">

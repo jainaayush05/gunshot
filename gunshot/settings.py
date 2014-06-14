@@ -2,7 +2,8 @@
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
-
+ROOT_URL = "http://localhost:8000/" #DO NOT FORGET TRAILING SLASH
+CRM_URL="http://192.168.0.7/vtigercrm/" # its crm.edupristine.com for live website
 ADMINS = (
     # ('Aayush Jain', 'jainaayush05@gmail.com'),
 )

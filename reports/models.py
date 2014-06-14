@@ -278,6 +278,9 @@ class GsReportFunnel(models.Model):
     product_id = models.IntegerField(blank=True, null=True)
     created = models.DateTimeField(blank=True, null=True)
     source = models.CharField(max_length=21, blank=True)
+    converted_amount = models.FloatField(blank=True)
+    region = models.CharField(max_length=256, blank=True)
+
     #@classmethod
     #def create(cls,leadid,city,state,pobox,country,phone,mobile,assgn_first_name,assgn_last_name,smownerid,description,createdtime,modifiedtime,lead_no,email,firstname,lastname,company,leadstatus,leadsource,course,campaign_id,google_keyword,ref_domain,traffic_src,google_cookie,verified,has_multiple_leads):
     #    GsReportFunnel = cls(leadid=leadid,city=city,state=state,pobox=pobox,country=country,phone=phone,mobile=mobile,assgn_first_name=assgn_first_name,assgn_last_name=assgn_last_name,smownerid=smownerid,description=description,createdtime=createdtime,modifiedtime=modifiedtime,lead_no=lead_no,email=email,firstname=firstname,lastname=lastname,company=company,leadstatus=leadstatus,leadsource=leadsource,course=course,campaign_id=campaign_id,google_keyword=google_keyword,ref_domain=ref_domain,traffic_src=traffic_src,google_cookie=google_cookie,verified=verified, has_multiple_leads=has_multiple_leads)
