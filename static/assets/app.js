@@ -1,5 +1,5 @@
 var load_sidebar = function () {
-        $.getJSON( 'http://localhost:8000/static/json/roles.json' , function( data ) {
+        $.getJSON( '/static/json/roles.json' , function( data ) {
             console.log( "json_loaded_from_file" );
 
         var option_list = data.cto.opn;
