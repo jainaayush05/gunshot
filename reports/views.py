@@ -696,7 +696,7 @@ class PrintReport(APIView):
     def get(self, request, format=None):
         link=request.GET.get('link', False)
         name=request.GET.get('name', False)
-        link= settings.ROOT_URL+'/sales_report/'
+        link= settings.ROOT_URL+'sales_report/'
         name='Sales Report'
         pdfkit.from_url(link, 'static/user_data/reports/'+name+'.pdf')
         now = datetime.datetime.now()

@@ -103,7 +103,7 @@
                var key = "gs_id";
                delete global_gsm_data[i]["gs_id"];
                 $.ajax({
-                       url: '{{root_url}}/gunshots/'+global_gsm_data[i].id,
+                       url: '{{root_url}}gunshots/'+global_gsm_data[i].id,
                        type: 'put',
                        dataType: 'json',
                        data: global_gsm_data[i],
@@ -127,7 +127,7 @@
           region = $('#region').find(":selected").val();
           
          $.ajax({
-              url: '{{root_url}}/crm_data/',
+              url: '{{root_url}}crm_data/',
               type: 'get',
               dataType: 'json',
               data: $('form#add_new_transaction').serialize(),
@@ -136,7 +136,7 @@
                   
                      if( data.has_multiple_leads == "yes"){
                            $.ajax({
-                                url: '{{root_url}}/gunshots_multiple/'+data.id+'/?format=json',
+                                url: '{{root_url}}gunshots_multiple/'+data.id+'/?format=json',
                                 type: 'get',
                                 dataType: 'json',
                                 data: data.id,
@@ -157,7 +157,7 @@
                      }
                      else{
                          $.ajax({
-                                url: '{{root_url}}/gunshots/'+data.id+'/?format=json',
+                                url: '{{root_url}}gunshots/'+data.id+'/?format=json',
                                 type: 'get',
                                 dataType: 'json',
                                 data: data.id,
