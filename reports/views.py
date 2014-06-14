@@ -61,7 +61,7 @@ class CreateLead(APIView):
         user_id =request.POST.get('assigned_name', False)
         if user_id:
             user = VtigerUsers.objects.get(id = user_id)
-            url =settings.CRM_URL+'vtigercrm/modules/harry/post.php/'
+            url =settings.CRM_URL+'modules/harry/post.php/'
             data = "lead_no="+lead_no+"&assign="+user.user_name
             req = urllib2.Request(url, data, http_headers)
             response = urllib2.urlopen(req).read()
