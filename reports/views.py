@@ -544,7 +544,7 @@ class GunshotMultipleDetail(APIView):
 class SalesReport(APIView):
     
     def get(self, request, format=None):
-        if request.session.get('user_id', False):
+        if request.session.get('user_id', False) or (request.GET.get('print')=='true'):
             now = datetime.datetime.now()
             name="Aayush"
             #Truncations
@@ -694,21 +694,27 @@ class SalesReport(APIView):
 class PrintReport(APIView):
     
     def get(self, request, format=None):
-        link=request.GET.get('link', False)
         name=request.GET.get('name', False)
-        link= settings.ROOT_URL+'sales_report/'
-        name='Sales Report'
+        link= settings.ROOT_URL+'sales_report/?print=true'
+        now = datetime.datetime.now().strftime("_%Y-%m-%d_%H:%M:%S")
+        name=name+now
         pdfkit.from_url(link, 'static/user_data/reports/'+name+'.pdf')
-        now = datetime.datetime.now()
         return redirect('../static/user_data/reports/'+name+'.pdf')
 
 class MailReport(APIView):
     
-    def get(self, request, format=None):
-        email = EmailMessage('Test subject', 'This is the body', 'manish@edupristine.org',['jainaayush05@gmail.com'],headers = {'Reply-To': 'manish@edupristine.org'})
-        email.attach_file('static/user_data/reports/sales_report.pdf')
+    def post(self, request, format=None):
+        name=request.POST.get('name', False)
+        to_email=request.POST.get('to_email', False)
+        subject=request.POST.get('subject', False)
+        link= settings.ROOT_URL+'sales_report/?print=true'
+        now = datetime.datetime.now().strftime("_%Y-%m-%d_%H:%M:%S")
+        name=name+now
+        pdfkit.from_url(link, 'static/user_data/reports/'+name+'.pdf')
+        email = EmailMessage(subject, 'pfa, sales report generated on '+now, 'manish@edupristine.org',[to_email],headers = {'Reply-To': 'manish@edupristine.org'})
+        email.attach_file('static/user_data/reports/'+name+'.pdf')
         email.send("fail_silently=False")
-        return redirect('../static/user_data/reports/Sales Report.pdf')
+        return Response('Mail successfully sent')
 
 class FunnelReport(APIView):
     

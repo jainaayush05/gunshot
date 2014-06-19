@@ -22,6 +22,21 @@
          load_regression_chart();
         
         });
+      var send_mail = function(){
+        $('#emailModal').modal('hide');
+        $('#emailWaitModal').modal('show');
+        $.ajax({
+                 url: '/mail_report/',
+                 type: 'post',
+                 dataType: 'json',
+                 data:$('form#emailForm').serialize(),
+                 success: function(data) {
+                  alert('Mail Sent');
+                  console.log(data)
+                  $('#emailWaitModal').modal('hide');
+               }
+           });
+      }
        var global_gsm_data;
        var global_gs_data;
        var verifygs= function(gs_id){
@@ -250,7 +265,7 @@
                      <div class="btn-group">
                         <button type="button" class="btn btn-round btn-default dropdown-toggle" data-toggle="dropdown"><i class="fa fa-save"></i> Save Report <span class="caret"></span></button>
                         <ul class="dropdown-menu" role="menu">
-                           <li><a href='/print_report/'>Pdf</a></li>
+                           <li><a href='/print_report/?print=true&name=sales_report'>Pdf</a></li>
                            <li><a href="#">Excel</a></li>
                         </ul>
                      </div>
@@ -706,11 +721,12 @@
                </div>
                <div class="modal-body">
                   <div class="inner no-radius">
-                     <form method="post" class="basic-form">
+                     <form id="emailForm" class="basic-form">
                         <div class="row">
+                        <input type="hidden" name="name" id="name" value="sales_report">
                            <div class="col-md-12">
-                              <label for="email">E-Mail:</label>
-                              <input type="text" name="email" id="email" placeholder="Recipient's email">
+                              <label for="to_email">E-Mail:</label>
+                              <input type="text" name="to_email" id="to_email" placeholder="Recipient's email">
                            </div>
                            <div class="col-md-12">
                               <label for="subject">Subject:</label>
@@ -731,8 +747,25 @@
                </div>
                <div class="modal-footer">
                   <button type="button" class="btn btn-lg btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Discard</button>
-                  <button type="button" class="btn btn-lg btn-default" data-dismiss="modal"><i class="fa fa-check"></i> Send mail</button>
+                  <button type="button" class="btn btn-lg btn-default" onclick='send_mail();'><i class="fa fa-check"></i> Send mail</button>
                </div>
+            </div>
+         </div>
+      </div>
+      <!-- Email Modal -->
+      <div class="modal fade" id="emailWaitModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+         <div class="modal-dialog">
+            <div class="modal-content">
+               <div class="modal-body">
+                  <div class="inner no-radius">
+                        <div class="row">
+                           <div class="col-md-12" align="center">
+                              <h2>Wait while your email is being sent...</h2>
+                           </div>
+                        </div>
+                  </div>
+               </div>
+               
             </div>
          </div>
       </div>
